@@ -30,6 +30,8 @@
         <jakarta.version>3.0.2</jakarta.version>
         <lombok.version>1.18.34</lombok.version>
         <postgresql.version>42.7.4</postgresql.version>
+        <model.mapper.version>3.2.1</model.mapper.version>
+        <swagger.version>2.3.0</swagger.version>
     </properties>
     <dependencies>
         <dependency>
@@ -64,6 +66,16 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>${model.mapper.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
 
     </dependencies>
