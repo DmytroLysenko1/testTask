@@ -34,7 +34,7 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        userDTO = new UserDTO(1L, "John Doe", "john.doe@example.com", "password");
+        this.userDTO = new UserDTO(1L, "John Doe", "john.doe@example.com", "password");
     }
 
     @Test
@@ -43,9 +43,9 @@ public class UserControllerTest {
                 new UserDTO(1L, "John Doe", "john.doe@example.com", "password"),
                 new UserDTO(2L, "Jane Doe", "jane.doe@example.com", "password")
         );
-        when(userService.getAllUsers()).thenReturn(users);
+        when(this.userService.getAllUsers()).thenReturn(users);
 
-        mockMvc.perform(get("/users"))
+        this.mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -58,9 +58,9 @@ public class UserControllerTest {
 
     @Test
     public void test_getUserById_returnsOk() throws Exception {
-        when(userService.getUserById(any(Long.class))).thenReturn(Optional.of(this.userDTO));
+        when(this.userService.getUserById(any(Long.class))).thenReturn(Optional.of(this.userDTO));
 
-        mockMvc.perform(get("/users/1"))
+        this.mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1L))
@@ -71,17 +71,17 @@ public class UserControllerTest {
 
     @Test
     public void test_getUserById_returnsNotFound() throws Exception {
-        when(userService.getUserById(anyLong())).thenReturn(Optional.empty());
+        when(this.userService.getUserById(anyLong())).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/users/1"))
+        this.mockMvc.perform(get("/users/1"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void test_createUser_returnsCreated() throws Exception {
-        when(userService.createUser(any(UserDTO.class))).thenReturn(this.userDTO);
+        when(this.userService.createUser(any(UserDTO.class))).thenReturn(this.userDTO);
 
-        mockMvc.perform(post("/users")
+        this.mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                 {
@@ -100,7 +100,7 @@ public class UserControllerTest {
 
     @Test
     public void test_createUser_returnsBadRequest() throws Exception {
-        mockMvc.perform(post("/users")
+        this.mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
             {
@@ -114,9 +114,9 @@ public class UserControllerTest {
 
     @Test
     public void test_updateUser_returnsOk() throws Exception {
-        when(userService.updateUser(anyLong(), any(UserDTO.class))).thenReturn(Optional.of(this.userDTO));
+        when(this.userService.updateUser(anyLong(), any(UserDTO.class))).thenReturn(Optional.of(this.userDTO));
 
-        mockMvc.perform(put("/users/1")
+        this.mockMvc.perform(put("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                 {
@@ -135,9 +135,9 @@ public class UserControllerTest {
 
     @Test
     public void test_updateUser_returnsNotFound() throws Exception {
-        when(userService.updateUser(anyLong(), any(UserDTO.class))).thenReturn(Optional.empty());
+        when(this.userService.updateUser(anyLong(), any(UserDTO.class))).thenReturn(Optional.empty());
 
-        mockMvc.perform(put("/users/1")
+        this.mockMvc.perform(put("/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
             {
@@ -151,9 +151,9 @@ public class UserControllerTest {
 
     @Test
     public void test_deleteUser_returnsNoContent() throws Exception {
-        doNothing().when(userService).deleteUser(anyLong());
+        doNothing().when(this.userService).deleteUser(anyLong());
 
-        mockMvc.perform(delete("/users/1"))
+        this.mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isNoContent());
     }
 }
