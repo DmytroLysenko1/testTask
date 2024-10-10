@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,10 +32,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Long id) {
+    public Optional<UserDTO> getUserById(Long id) {
         log.info("Fetching user with id: {}", id);
         User user = findUserById(id);
-        return this.modelMapper.map(user, UserDTO.class);
+        return Optional.ofNullable(this.modelMapper.map(user, UserDTO.class));
     }
 
     @Override
@@ -48,12 +49,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
+    public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
         log.info("Updating user with id: {}", id);
         User toUpdate = findUserById(id);
         enhanceWithNewManagementData(toUpdate, userDTO);
         User updatedUser = this.userRepo.save(toUpdate);
-        return this.modelMapper.map(updatedUser, UserDTO.class);
+        return Optional.ofNullable(this.modelMapper.map(updatedUser, UserDTO.class));
     }
 
     @Override

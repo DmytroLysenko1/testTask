@@ -15,6 +15,7 @@ import org.example.dto.WithdrawalDTO;
 import org.example.service.BankAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/bank-accounts")
 @Tag(name = "Bank Account", description = "Bank Account API")
+@Validated
 public class BankAccountController {
 
     private final BankAccountService bankAccountService;
@@ -52,9 +54,9 @@ public class BankAccountController {
             @ApiResponse(responseCode = "201", description = HttpStatuses.CREATED),
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     })
-    public ResponseEntity<BankAccountDTO> createBankAccount(@RequestBody BankAccountDTO bankAccountDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(this.bankAccountService.createBankAccount(bankAccountDTO));
+    public ResponseEntity<BankAccountDTO> createBankAccount(@Valid @RequestBody BankAccountDTO bankAccountDTO) {
+        BankAccountDTO createdAccount = bankAccountService.createBankAccount(bankAccountDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
     }
 
     @PutMapping("/{id}")
