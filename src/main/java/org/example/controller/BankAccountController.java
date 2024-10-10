@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,7 +53,8 @@ public class BankAccountController {
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
     })
     public ResponseEntity<BankAccountDTO> createBankAccount(@RequestBody BankAccountDTO bankAccountDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.bankAccountService.createBankAccount(bankAccountDTO));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(this.bankAccountService.createBankAccount(bankAccountDTO));
     }
 
     @PutMapping("/{id}")
@@ -62,7 +64,9 @@ public class BankAccountController {
             @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    public ResponseEntity<BankAccountDTO> updateBankAccount(@PathVariable Long id, @RequestBody BankAccountDTO bankAccountDTO) {
+    public ResponseEntity<BankAccountDTO> updateBankAccount(@PathVariable Long id,
+                                                            @Parameter(required = true)
+                                                            @RequestBody BankAccountDTO bankAccountDTO) {
         return ResponseEntity.ok(this.bankAccountService.updateBankAccount(id, bankAccountDTO));
     }
 

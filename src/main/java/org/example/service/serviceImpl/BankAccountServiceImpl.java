@@ -2,11 +2,9 @@ package org.example.service.serviceImpl;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.constant.ErrorMessage;
-import org.example.dto.BankAccountDTO;
-import org.example.dto.DepositDTO;
-import org.example.dto.TransferDTO;
-import org.example.dto.WithdrawalDTO;
+import org.example.dto.*;
 import org.example.entity.BankAccount;
 import org.example.entity.DetailAccount;
 import org.example.entity.User;
@@ -23,107 +21,136 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class BankAccountServiceImpl implements BankAccountService {
-    private final BankAccountRepository bankAccountRepository;
+    private final BankAccountRepository bankAccountRepo;
     private final UserRepository userRepo;
     private final ModelMapper modelMapper;
 
     @Override
     public List<BankAccountDTO> getAllBankAccounts() {
-        return this.bankAccountRepository.findAll().stream().map(
-                bankAccount -> this.modelMapper.map(bankAccount, BankAccountDTO.class))
+        log.info("Fetching all bank accounts");
+        return this.bankAccountRepo.findAll().stream()
+                .map(bankAccount -> this.modelMapper.map(bankAccount, BankAccountDTO.class))
                 .toList();
     }
 
     @Override
     public BankAccountDTO getBankAccountById(Long id) {
-        BankAccount bankAccount = this.bankAccountRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + id));
+        log.info("Fetching bank account with id: {}", id);
+        BankAccount bankAccount = findBankAccountById(id);
         return this.modelMapper.map(bankAccount, BankAccountDTO.class);
     }
 
     @Override
     @Transactional
     public BankAccountDTO createBankAccount(@Valid BankAccountDTO bankAccountDTO) {
-        BankAccount bankAccount = modelMapper.map(bankAccountDTO, BankAccount.class);
-
-        // Fetch the user entity and set it to the bank account
-        User user = userRepo.findById(bankAccountDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        log.info("Creating a new bank account: {}", bankAccountDTO);
+        BankAccount bankAccount = this.modelMapper.map(bankAccountDTO, BankAccount.class);
+        User user = findUserById(bankAccountDTO.getUserId());
         bankAccount.setUser(user);
-
-        if (bankAccount.getBalance() == null) {
-            bankAccount.setBalance(BigDecimal.ZERO);
-        }
-
-        BankAccount finalBankAccount = bankAccount;
-        List<DetailAccount> detailAccounts = bankAccountDTO.getDetailAccounts().stream()
-                .map(detailAccountDTO -> {
-                    DetailAccount detailAccount = modelMapper.map(detailAccountDTO, DetailAccount.class);
-                    detailAccount.setBankAccount(finalBankAccount);
-                    return detailAccount;
-                }).toList();
-        bankAccount.setDetailAccounts(detailAccounts);
-
-        bankAccount = bankAccountRepository.save(bankAccount);
-        return modelMapper.map(bankAccount, BankAccountDTO.class);
+        initializeBalance(bankAccount);
+        setDetailAccounts(bankAccount, bankAccountDTO.getDetailAccounts());
+        bankAccount = this.bankAccountRepo.save(bankAccount);
+        log.info("Created bank account with id: {}", bankAccount.getId());
+        return this.modelMapper.map(bankAccount, BankAccountDTO.class);
     }
 
     @Override
     @Transactional
     public BankAccountDTO updateBankAccount(Long id, @Valid BankAccountDTO bankAccountDTO) {
-        BankAccount existingBankAccount = this.bankAccountRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + id));
+        log.info("Updating bank account with id: {}", id);
+        BankAccount existingBankAccount = findBankAccountById(id);
         this.modelMapper.map(bankAccountDTO, existingBankAccount);
-        BankAccount updatedBankAccount = this.bankAccountRepository.save(existingBankAccount);
+        BankAccount updatedBankAccount = this.bankAccountRepo.save(existingBankAccount);
+        log.info("Updated bank account with id: {}", id);
         return this.modelMapper.map(updatedBankAccount, BankAccountDTO.class);
     }
 
     @Override
     @Transactional
     public void deleteBankAccount(Long id) {
-        if (!this.bankAccountRepository.existsById(id)) {
+        log.info("Deleting bank account with id: {}", id);
+        if (!this.bankAccountRepo.existsById(id)) {
+            log.error("Bank account not found with id: {}", id);
             throw new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + id);
         }
-        this.bankAccountRepository.deleteById(id);
+        this.bankAccountRepo.deleteById(id);
+        log.info("Deleted bank account with id: {}", id);
     }
 
     @Override
     @Transactional
     public void depositFunds(DepositDTO depositDTO) {
-        BankAccount bankAccount = this.bankAccountRepository.findById(depositDTO.getAccountId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + depositDTO.getAccountId()));
+        log.info("Depositing funds to bank account with id: {}", depositDTO.getAccountId());
+        BankAccount bankAccount = findBankAccountById(depositDTO.getAccountId());
         bankAccount.setBalance(bankAccount.getBalance().add(depositDTO.getAmount()));
-        this.bankAccountRepository.save(bankAccount);
+        this.bankAccountRepo.save(bankAccount);
+        log.info("Deposited {} to bank account with id: {}", depositDTO.getAmount(), depositDTO.getAccountId());
     }
 
     @Override
     public void withdrawFunds(WithdrawalDTO withdrawalDTO) {
-        BankAccount bankAccount = this.bankAccountRepository.findById(withdrawalDTO.getAccountId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + withdrawalDTO.getAccountId()));
-
-        if (bankAccount.getBalance().compareTo(withdrawalDTO.getAmount()) < 0) {
-            throw new InsufficientFundsException(ErrorMessage.INSUFFICIENT_FUNDS);
-        }
+        log.info("Withdrawing funds from bank account with id: {}", withdrawalDTO.getAccountId());
+        BankAccount bankAccount = findBankAccountById(withdrawalDTO.getAccountId());
+        validateSufficientFunds(bankAccount, withdrawalDTO.getAmount());
         bankAccount.setBalance(bankAccount.getBalance().subtract(withdrawalDTO.getAmount()));
-        this.bankAccountRepository.save(bankAccount);
+        this.bankAccountRepo.save(bankAccount);
+        log.info("Withdrew {} from bank account with id: {}", withdrawalDTO.getAmount(), withdrawalDTO.getAccountId());
     }
 
     @Override
     public void transferFunds(TransferDTO transferDTO) {
-        BankAccount sourceAccount = this.bankAccountRepository.findById(transferDTO.getSourceAccountId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + transferDTO.getSourceAccountId()));
-        BankAccount destinationAccount = this.bankAccountRepository.findById(transferDTO.getDestinationAccountId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + transferDTO.getDestinationAccountId()));
+        log.info("Transferring funds from bank account with id: {} to bank account with id: {}",
+                transferDTO.getSourceAccountId(), transferDTO.getDestinationAccountId());
 
-        if (sourceAccount.getBalance().compareTo(transferDTO.getAmount()) < 0) {
-            throw new InsufficientFundsException(ErrorMessage.INSUFFICIENT_FUNDS);
-        }
-
+        BankAccount sourceAccount = findBankAccountById(transferDTO.getSourceAccountId());
+        BankAccount destinationAccount = findBankAccountById(transferDTO.getDestinationAccountId());
+        validateSufficientFunds(sourceAccount, transferDTO.getAmount());
         sourceAccount.setBalance(sourceAccount.getBalance().subtract(transferDTO.getAmount()));
         destinationAccount.setBalance(destinationAccount.getBalance().add(transferDTO.getAmount()));
-        this.bankAccountRepository.save(sourceAccount);
-        this.bankAccountRepository.save(destinationAccount);
+        this.bankAccountRepo.save(sourceAccount);
+        this.bankAccountRepo.save(destinationAccount);
+        log.info("Transferred {} from bank account with id: {} to bank account with id: {}",
+                transferDTO.getAmount(), transferDTO.getSourceAccountId(), transferDTO.getDestinationAccountId());
+    }
+
+    private BankAccount findBankAccountById(Long id) {
+        log.debug("Finding bank account with id: {}", id);
+        return this.bankAccountRepo.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + id));
+    }
+
+    private User findUserById(Long userId) {
+        log.debug("Finding user with id: {}", userId);
+        return this.userRepo.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+    }
+
+    private void initializeBalance(BankAccount bankAccount) {
+        if (bankAccount.getBalance() == null) {
+            log.debug("Initializing balance for bank account with id: {}", bankAccount.getId());
+            bankAccount.setBalance(BigDecimal.ZERO);
+        }
+    }
+
+    private void setDetailAccounts(BankAccount bankAccount, List<DetailAccountDTO> detailAccountDTOs) {
+        log.debug("Setting detail accounts for bank account with id: {}", bankAccount.getId());
+        List<DetailAccount> detailAccounts = detailAccountDTOs.stream()
+                .map(detailAccountDTO -> {
+                    DetailAccount detailAccount = this.modelMapper.map(detailAccountDTO, DetailAccount.class);
+                    detailAccount.setBankAccount(bankAccount);
+                    return detailAccount;
+                }).toList();
+        bankAccount.setDetailAccounts(detailAccounts);
+    }
+
+    private void validateSufficientFunds(BankAccount bankAccount, BigDecimal amount) {
+        log.debug("Validating sufficient funds for bank account with id: {}", bankAccount.getId());
+        if (bankAccount.getBalance().compareTo(amount) < 0) {
+            log.error("Insufficient funds for bank account with id: {}", bankAccount.getId());
+            throw new InsufficientFundsException(ErrorMessage.INSUFFICIENT_FUNDS);
+        }
     }
 }

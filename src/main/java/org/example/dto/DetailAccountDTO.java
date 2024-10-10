@@ -7,7 +7,6 @@ import java.time.LocalDate;
 
 @Data
 public class DetailAccountDTO {
-    private Long id;
     private LocalDate reportingDate;
     private BigDecimal sum;
     private BigDecimal percentage;

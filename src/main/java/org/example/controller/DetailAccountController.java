@@ -2,16 +2,13 @@ package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.example.constant.HttpStatuses;
 import org.example.dto.DetailAccountDTO;
-import org.example.model.SwaggerExampleModel;
 import org.example.service.DetailAccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +18,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping("/detail-account")
 @Tag(name = "Detail Account Controller", description = "Controller for Detail Account")
 public class DetailAccountController {
@@ -30,11 +26,10 @@ public class DetailAccountController {
     @GetMapping
     @Operation(summary = "Get all detail accounts")
     @ApiResponses(value = {
-            @ApiResponse(description = "200", responseCode = HttpStatuses.OK)
+            @ApiResponse(description = "200", responseCode = HttpStatuses.OK),
     })
     public ResponseEntity<List<DetailAccountDTO>> getAllDetailAccounts() {
-        log.info("Get all detail accounts");
-        List<DetailAccountDTO> detailAccounts = detailAccountService.getAllDetailAccounts();
+        List<DetailAccountDTO> detailAccounts = this.detailAccountService.getAllDetailAccounts();
         return ResponseEntity.ok(detailAccounts);
     }
 
@@ -42,15 +37,11 @@ public class DetailAccountController {
     @Operation(summary = "Get detail account by id")
     @ApiResponses(value = {
             @ApiResponse(description = "200", responseCode = HttpStatuses.OK,
-                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class),
-                            examples = {
-                                    @ExampleObject(name = "Detail Account Example",
-                                            value = SwaggerExampleModel.DETAIL_ACCOUNT_MODEL)
-                            }))
+                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class))),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     public ResponseEntity<DetailAccountDTO> getDetailAccountById(@PathVariable Long id) {
-        log.info("Get detail account by id: {}", id);
-        DetailAccountDTO detailAccount = detailAccountService.getDetailAccountById(id);
+        DetailAccountDTO detailAccount = this.detailAccountService.getDetailAccountById(id);
         return ResponseEntity.ok(detailAccount);
     }
 
@@ -58,15 +49,12 @@ public class DetailAccountController {
     @Operation(summary = "Create new detail account")
     @ApiResponses(value = {
             @ApiResponse(description = "200", responseCode = HttpStatuses.CREATED,
-                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class),
-                            examples = {
-                                    @ExampleObject(name = "Detail Account Example",
-                                            value = SwaggerExampleModel.DETAIL_ACCOUNT_MODEL)
-                            }))
+                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class))),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+
     })
     public ResponseEntity<DetailAccountDTO> createDetailAccount(@RequestBody DetailAccountDTO detailAccountDTO) {
-        log.info("Create detail account: {}", detailAccountDTO);
-        DetailAccountDTO createdDetailAccount = detailAccountService.createDetailAccount(detailAccountDTO);
+        DetailAccountDTO createdDetailAccount = this.detailAccountService.createDetailAccount(detailAccountDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdDetailAccount);
     }
 
@@ -74,15 +62,12 @@ public class DetailAccountController {
     @Operation(summary = "Update an existing detail account")
     @ApiResponses(value = {
             @ApiResponse(description = "200", responseCode = HttpStatuses.OK,
-                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class),
-                            examples = {
-                                    @ExampleObject(name = "Detail Account Example",
-                                            value = SwaggerExampleModel.DETAIL_ACCOUNT_MODEL)
-                            }))
+                    content = @Content(schema = @Schema(implementation = DetailAccountDTO.class))),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     public ResponseEntity<DetailAccountDTO> updateDetailAccount(@PathVariable Long id, @RequestBody DetailAccountDTO detailAccountDTO) {
-        log.info("Update detail account by id: {}", id);
-        DetailAccountDTO updatedDetailAccount = detailAccountService.updateDetailAccount(id, detailAccountDTO);
+        DetailAccountDTO updatedDetailAccount = this.detailAccountService.updateDetailAccount(id, detailAccountDTO);
         return ResponseEntity.ok(updatedDetailAccount);
     }
 
@@ -94,8 +79,7 @@ public class DetailAccountController {
             @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     public ResponseEntity<Void> deleteDetailAccount(@PathVariable Long id) {
-        log.info("Delete detail account by id: {}", id);
-        detailAccountService.deleteDetailAccount(id);
+        this.detailAccountService.deleteDetailAccount(id);
         return ResponseEntity.noContent().build();
     }
 }
