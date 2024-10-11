@@ -1,7 +1,6 @@
 package org.example.service.serviceImpl;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.constant.ErrorMessage;
@@ -29,13 +28,14 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getAllUsers() {
         log.info(LogMessage.FETCHING_ALL_USERS);
 
-        return userRepo.findAll().stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
+        List<User> users = this.userRepo.findAll();
+        return users.stream()
+                .map(user -> this.modelMapper.map(user, UserDTO.class))
                 .toList();
     }
 
     @Override
-    public Optional<UserDTO> getUserById(@NotNull Long id) {
+    public Optional<UserDTO> getUserById(Long id) {
         log.info(LogMessage.FETCHING_USER_BY_ID, id);
 
         User user = findUserById(id);
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Optional<UserDTO> updateUser(@NotNull Long id, UserDTO userDTO) {
+    public Optional<UserDTO> updateUser(Long id, UserDTO userDTO) {
         log.info(LogMessage.UPDATING_USER_BY_ID, id);
 
         User toUpdate = findUserById(id);
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(@NotNull Long id) {
+    public void deleteUser(Long id) {
         log.info(LogMessage.DELETING_USER_BY_ID, id);
 
         if (!this.userRepo.existsById(id)) {
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         this.userRepo.deleteById(id);
     }
 
-    private User findUserById(@NotNull Long id) {
+    private User findUserById(Long id) {
         return this.userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
     }

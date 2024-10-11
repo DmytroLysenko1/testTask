@@ -2,6 +2,7 @@ package org.example.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import org.example.constant.SwaggerMessage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,8 +12,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Bank Account API")
-                        .version("1.0")
-                        .description("API documentation for the Bank Account application"));
+                        .title(SwaggerMessage.TITLE)
+                        .version(SwaggerMessage.VERSION)
+                        .description(SwaggerMessage.DESCRIPTION));
     }
 }

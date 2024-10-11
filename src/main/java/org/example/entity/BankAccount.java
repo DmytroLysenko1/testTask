@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.example.constant.ServiceValidationConstants;
 import org.example.enums.AccountStatus;
-import org.hibernate.proxy.HibernateProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Table(name = "bank_accounts")
@@ -24,25 +23,25 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty
+    @NotEmpty(message = ServiceValidationConstants.BANK_NUMBER_NOT_EMPTY)
     private String bankNumber;
 
-    @NotEmpty
+    @NotEmpty(message = ServiceValidationConstants.TYPE_NOT_EMPTY)
     private String type;
 
-    @NotNull
+    @NotNull(message = ServiceValidationConstants.STATUS_NOT_NULL)
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
 
-    @NotNull
+    @NotNull(message = ServiceValidationConstants.DATE_START_NOT_NULL)
     private LocalDate dateStart;
 
     private LocalDate dateEnd;
 
-    @NotNull
+    @NotNull(message = ServiceValidationConstants.VALID_UNTIL_NOT_NULL)
     private LocalDate validUntil;
 
-    @NotNull
+    @NotNull(message = ServiceValidationConstants.BALANCE_NOT_NULL)
     private BigDecimal balance = BigDecimal.ZERO;
 
     @NotNull
@@ -55,18 +54,16 @@ public class BankAccount {
     private List<DetailAccount> detailAccounts;
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         BankAccount that = (BankAccount) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
+        return id != null && id.equals(that.id);
     }
 
     @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+    public int hashCode() {
+        return getClass().hashCode();
     }
+
 }
