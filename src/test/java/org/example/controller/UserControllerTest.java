@@ -34,24 +34,22 @@ public class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        this.userDTO = new UserDTO(1L, "John Doe", "john.doe@example.com", "password");
+        this.userDTO = new UserDTO("John Doe", "john.doe@example.com", "password");
     }
 
     @Test
     public void test_getAllUsers_returnsOk() throws Exception {
         List<UserDTO> users = List.of(
-                new UserDTO(1L, "John Doe", "john.doe@example.com", "password"),
-                new UserDTO(2L, "Jane Doe", "jane.doe@example.com", "password")
+                new UserDTO("John Doe", "john.doe@example.com", "password"),
+                new UserDTO("Jane Doe", "jane.doe@example.com", "password")
         );
         when(this.userService.getAllUsers()).thenReturn(users);
 
         this.mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].username").value("John Doe"))
                 .andExpect(jsonPath("$[0].email").value("john.doe@example.com"))
-                .andExpect(jsonPath("$[1].id").value(2L))
                 .andExpect(jsonPath("$[1].username").value("Jane Doe"))
                 .andExpect(jsonPath("$[1].email").value("jane.doe@example.com"));
     }
@@ -63,7 +61,6 @@ public class UserControllerTest {
         this.mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.username").value("John Doe"))
                 .andExpect(jsonPath("$.email").value("john.doe@example.com"))
                 .andExpect(jsonPath("$.password").value("password"));
@@ -92,7 +89,6 @@ public class UserControllerTest {
                 """))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.username").value("John Doe"))
                 .andExpect(jsonPath("$.email").value("john.doe@example.com"))
                 .andExpect(jsonPath("$.password").value("password"));
@@ -127,7 +123,6 @@ public class UserControllerTest {
                 """))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.username").value("John Doe"))
                 .andExpect(jsonPath("$.email").value("john.doe@example.com"))
                 .andExpect(jsonPath("$.password").value("password"));

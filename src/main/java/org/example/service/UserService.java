@@ -13,5 +13,5 @@ public interface UserService {
     Optional<UserDTO> getUserById(Long id) throws NotFoundException;
     UserDTO createUser(UserDTO userDTO);
     Optional<UserDTO> updateUser(Long id, UserDTO userDTO);
-    void deleteUser(Long id);
+    void deleteUser(Long id) throws NotFoundException;
 }
