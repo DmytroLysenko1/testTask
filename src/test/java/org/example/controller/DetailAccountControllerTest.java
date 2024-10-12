@@ -1,8 +1,10 @@
 package org.example.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.constant.TestMessages;
 import org.example.dto.DetailAccountDTO;
 import org.example.service.DetailAccountService;
+import org.example.utils.ModelUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @WebMvcTest(DetailAccountController.class)
 public class DetailAccountControllerTest {
     @Autowired
@@ -30,17 +31,13 @@ public class DetailAccountControllerTest {
     @MockBean
     private DetailAccountService detailAccountService;
 
-    private final DetailAccountDTO detailAccountDTO = new DetailAccountDTO();
+    private DetailAccountDTO detailAccountDTO = new DetailAccountDTO();
+    private static final String BASE_URL = "/detail-account";
+    private static final String URL_ID = "/detail-account/1";
 
     @BeforeEach
     public void setUp() {
-        this.detailAccountDTO.setId(1L);
-        this.detailAccountDTO.setReportingDate(LocalDate.now());
-        this.detailAccountDTO.setSum(new BigDecimal("1000"));
-        this.detailAccountDTO.setPercentage(new BigDecimal("5"));
-        this.detailAccountDTO.setDiscountRate(new BigDecimal("2"));
-        this.detailAccountDTO.setTotalSum(1000L);
-        this.detailAccountDTO.setBankAccountId(1L);
+        this.detailAccountDTO = ModelUtils.getDetailAccountDTO();
     }
 
     @Test
@@ -48,7 +45,7 @@ public class DetailAccountControllerTest {
         when(this.detailAccountService.getAllDetailAccounts())
                 .thenReturn(Collections.singletonList(this.detailAccountDTO));
 
-        this.mockMvc.perform(get("/detail-account"))
+        this.mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id")
@@ -60,7 +57,7 @@ public class DetailAccountControllerTest {
         when(this.detailAccountService.getDetailAccountById(anyLong()))
                 .thenReturn(this.detailAccountDTO);
 
-        this.mockMvc.perform(get("/detail-account/1"))
+        this.mockMvc.perform(get(URL_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id")
@@ -72,7 +69,7 @@ public class DetailAccountControllerTest {
         when(this.detailAccountService.createDetailAccount(any(DetailAccountDTO.class)))
                 .thenReturn(this.detailAccountDTO);
 
-        this.mockMvc.perform(post("/detail-account")
+        this.mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                 {
@@ -95,7 +92,7 @@ public class DetailAccountControllerTest {
         when(this.detailAccountService.updateDetailAccount(anyLong(), any(DetailAccountDTO.class)))
                 .thenReturn(this.detailAccountDTO);
 
-        this.mockMvc.perform(put("/detail-account/1")
+        this.mockMvc.perform(put(URL_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                 {
@@ -116,9 +113,9 @@ public class DetailAccountControllerTest {
     @Test
     public void test_updateNonExistentDetailAccount_returnsNotFound() throws Exception {
         when(this.detailAccountService.updateDetailAccount(anyLong(), any(DetailAccountDTO.class)))
-                .thenThrow(new EntityNotFoundException("Detail account not found"));
+                .thenThrow(new EntityNotFoundException(TestMessages.DETAIL_ACCOUNT_NOT_FOUND));
 
-        this.mockMvc.perform(put("/detail-account/999")
+        this.mockMvc.perform(put(BASE_URL + "/999")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
             {
@@ -135,16 +132,16 @@ public class DetailAccountControllerTest {
 
     @Test
     public void test_deleteDetailAccount_returnsNoContent() throws Exception {
-        this.mockMvc.perform(delete("/detail-account/1"))
+        this.mockMvc.perform(delete(URL_ID))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void test_deleteNonExistentDetailAccount_returnsNotFound() throws Exception {
-        doThrow(new EntityNotFoundException("Detail account not found"))
+        doThrow(new EntityNotFoundException(TestMessages.DETAIL_ACCOUNT_NOT_FOUND))
                 .when(this.detailAccountService).deleteDetailAccount(anyLong());
 
-        this.mockMvc.perform(delete("/detail-account/999"))
+        this.mockMvc.perform(delete(BASE_URL + "/999"))
                 .andExpect(status().isNotFound());
     }
 }

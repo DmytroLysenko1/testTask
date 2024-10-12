@@ -1,11 +1,12 @@
 package org.example.service;
 
+import org.example.constant.TestMessages;
 import org.example.dto.UserDTO;
 import org.example.entity.User;
-import org.example.enums.Role;
 import org.example.exceptions.exception.NotFoundException;
 import org.example.repository.UserRepository;
 import org.example.service.serviceImpl.UserServiceImpl;
+import org.example.utils.ModelUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,15 +38,12 @@ public class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        this.user = new User(1L, "testuser", "test@example.com", Role.USER, "password123");
-        this.userDTO = new UserDTO();
-        this.userDTO.setUsername("testuser");
-        this.userDTO.setEmail("test@example.com");
-        this.userDTO.setPassword("password123");
+        this.user = ModelUtils.getUser();
+        this.userDTO = ModelUtils.getUserDTO();
     }
 
     @Test
-    void testGetAllUsers() {
+    void testGetAllUsers_returnsUserList() {
         when(this.userRepository.findAll()).thenReturn(List.of(this.user));
         when(this.modelMapper.map(any(User.class), eq(UserDTO.class))).thenReturn(this.userDTO);
 
@@ -57,7 +55,7 @@ public class UserServiceImplTest {
         verify(this.userRepository, times(1)).findAll();
     }
     @Test
-    void testGetAllUsers_EmptyRepository() {
+    void testGetAllUsers_returnsEmptyListWhenNoUsers() {
         when(this.userRepository.findAll()).thenReturn(List.of());
 
         List<UserDTO> users = this.userService.getAllUsers();
@@ -68,7 +66,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById() {
+    void testGetUserById_returnsUser() {
         when(this.userRepository.findById(1L)).thenReturn(Optional.of(this.user));
         when(this.modelMapper.map(any(User.class), eq(UserDTO.class))).thenReturn(this.userDTO);
 
@@ -80,17 +78,17 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testGetUserById_UserNotFound() {
+    void testGetUserById_throwsNotFoundExceptionWhenUserNotFound() {
         when(this.userRepository.findById(1L)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotFoundException.class, () -> this.userService.getUserById(1L));
 
-        assertEquals("User not found by id: 1", exception.getMessage());
+        assertEquals(TestMessages.USER_NOT_FOUND_BY_ID_1, exception.getMessage());
         verify(this.userRepository, times(1)).findById(1L);
     }
 
     @Test
-    void testCreateUser() {
+    void testCreateUser_successfullyCreatesUser() {
         when(this.modelMapper.map(any(UserDTO.class), eq(User.class))).thenReturn(this.user);
         when(this.userRepository.save(any(User.class))).thenReturn(this.user);
         when(this.modelMapper.map(any(User.class), eq(UserDTO.class))).thenReturn(this.userDTO);
@@ -103,7 +101,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testUpdateUser() {
+    void testUpdateUser_successfullyUpdatesUser() {
         when(this.userRepository.findById(1L)).thenReturn(Optional.of(this.user));
         when(this.userRepository.save(any(User.class))).thenReturn(this.user);
         when(this.modelMapper.map(any(User.class), eq(UserDTO.class))).thenReturn(this.userDTO);
@@ -116,18 +114,18 @@ public class UserServiceImplTest {
         verify(this.userRepository, times(1)).save(any(User.class));
     }
     @Test
-    void testUpdateUser_UserNotFound() {
+    void testUpdateUser_throwsNotFoundExceptionWhenUserNotFound() {
         when(this.userRepository.findById(1L)).thenReturn(Optional.empty());
 
         Exception exception = assertThrows(NotFoundException.class, () -> this.userService.updateUser(1L, this.userDTO));
 
-        assertEquals("User not found by id: 1", exception.getMessage());
+        assertEquals(TestMessages.USER_NOT_FOUND_BY_ID_1, exception.getMessage());
         verify(this.userRepository, times(1)).findById(1L);
         verify(this.userRepository, times(0)).save(any(User.class));
     }
 
     @Test
-    void testDeleteUser() {
+    void testDeleteUser_successfullyDeletesUser() {
         when(this.userRepository.existsById(1L)).thenReturn(true);
 
         this.userService.deleteUser(1L);
@@ -137,12 +135,12 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void testDeleteUser_UserNotFound() {
+    void testDeleteUser_throwsNotFoundExceptionWhenUserNotFound() {
         when(this.userRepository.existsById(1L)).thenReturn(false);
 
         Exception exception = assertThrows(NotFoundException.class, () -> this.userService.deleteUser(1L));
 
-        assertEquals("User not found by id: 1", exception.getMessage());
+        assertEquals(TestMessages.USER_NOT_FOUND_BY_ID_1, exception.getMessage());
         verify(this.userRepository, times(1)).existsById(1L);
         verify(this.userRepository, times(0)).deleteById(1L);
     }

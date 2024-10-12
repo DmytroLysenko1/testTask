@@ -1,11 +1,13 @@
 package org.example.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.example.constant.TestMessages;
 import org.example.dto.BankAccountDTO;
 import org.example.dto.TransferDTO;
 import org.example.dto.WithdrawalDTO;
 import org.example.exceptions.exception.InsufficientFundsException;
 import org.example.service.BankAccountService;
+import org.example.utils.ModelUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 
 @WebMvcTest(BankAccountController.class)
@@ -35,15 +36,16 @@ public class BankAccountControllerTest {
     private BankAccountService bankAccountService;
 
     private static final String BASE_URL = "/bank-accounts";
-    private final BankAccountDTO bankAccountDTO = new BankAccountDTO();
+    private static final String URL_ID = "/bank-accounts/1";
+    private static final String WITHDRAW_URL = "/bank-accounts/withdraw";
+    private static final String TRANSFER_URL = "/bank-accounts/transfer";
+    private static final String DEPOSIT_URL = "/bank-accounts/deposit";
+
+    private BankAccountDTO bankAccountDTO = new BankAccountDTO();
 
     @BeforeEach
     public void setUp() {
-        this.bankAccountDTO.setId(1L);
-        this.bankAccountDTO.setBankNumber("123456");
-        this.bankAccountDTO.setType("SAVINGS");
-        this.bankAccountDTO.setStatus("ACTIVE");
-        this.bankAccountDTO.setUserId(1L);
+        this.bankAccountDTO = ModelUtils.getBankAccountDTO();
     }
 
     @Test
@@ -63,7 +65,7 @@ public class BankAccountControllerTest {
         when(this.bankAccountService.getBankAccountById(anyLong()))
                 .thenReturn(bankAccountDTO);
 
-        this.mockMvc.perform(get(BASE_URL + "/1")
+        this.mockMvc.perform(get(URL_ID)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json("""
@@ -76,7 +78,7 @@ public class BankAccountControllerTest {
     @Test
     public void test_getBankAccountById_returnsNotFound() throws Exception {
         when(this.bankAccountService.getBankAccountById(anyLong()))
-                .thenThrow(new EntityNotFoundException("Bank account not found"));
+                .thenThrow(new EntityNotFoundException(TestMessages.BANK_ACCOUNT_NOT_FOUND));
 
         this.mockMvc.perform(get(BASE_URL + "/999")
                         .accept(MediaType.APPLICATION_JSON))
@@ -136,7 +138,7 @@ public class BankAccountControllerTest {
         when(this.bankAccountService.updateBankAccount(anyLong(), any(BankAccountDTO.class)))
                 .thenReturn(bankAccountDTO);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.put(BASE_URL + "/1")
+        this.mockMvc.perform(MockMvcRequestBuilders.put(URL_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -153,13 +155,13 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_deleteBankAccount_returnsNoContent() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/1"))
+        this.mockMvc.perform(MockMvcRequestBuilders.delete(URL_ID))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     public void test_deleteNonExistentBankAccount_returnsNotFound() throws Exception {
-        doThrow(new EntityNotFoundException("Bank account not found"))
+        doThrow(new EntityNotFoundException(TestMessages.BANK_ACCOUNT_NOT_FOUND))
                 .when(bankAccountService).deleteBankAccount(anyLong());
 
         this.mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/999"))
@@ -168,7 +170,7 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_depositFunds_returnsOk() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/deposit")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(DEPOSIT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {
@@ -181,7 +183,7 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_withdrawFunds_returnsOk() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/withdraw")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(WITHDRAW_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {
@@ -194,14 +196,12 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_withdrawFunds_insufficientBalance_returnsBadRequest() throws Exception {
-        WithdrawalDTO withdrawalDTO = new WithdrawalDTO();
-        withdrawalDTO.setAccountId(1L);
-        withdrawalDTO.setAmount(new BigDecimal("1000"));
+        WithdrawalDTO withdrawalDTO = ModelUtils.getWithdrawalDTO();
 
-        doThrow(new InsufficientFundsException("Insufficient funds"))
+        doThrow(new InsufficientFundsException(TestMessages.INSUFFICIENT_FUNDS))
                 .when(bankAccountService).withdrawFunds(any(WithdrawalDTO.class));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/withdraw")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(WITHDRAW_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {
@@ -214,7 +214,7 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_transferFunds_returnsOk() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/transfer")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(TRANSFER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {
@@ -228,15 +228,12 @@ public class BankAccountControllerTest {
 
     @Test
     public void test_transferFunds_insufficientBalance_returnsBadRequest() throws Exception {
-        TransferDTO transferDTO = new TransferDTO();
-        transferDTO.setSourceAccountId(1L);
-        transferDTO.setDestinationAccountId(2L);
-        transferDTO.setAmount(new BigDecimal("1000"));
+        TransferDTO transferDTO = ModelUtils.getTransferDTO();
 
-        doThrow(new InsufficientFundsException("Insufficient funds"))
+        doThrow(new InsufficientFundsException(TestMessages.INSUFFICIENT_FUNDS))
                 .when(bankAccountService).transferFunds(any(TransferDTO.class));
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL + "/transfer")
+        this.mockMvc.perform(MockMvcRequestBuilders.post(TRANSFER_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                   {

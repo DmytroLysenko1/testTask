@@ -1,10 +1,12 @@
 package org.example.service;
 
+import org.example.constant.TestMessages;
 import org.example.dto.DetailAccountDTO;
 import org.example.entity.DetailAccount;
 import org.example.exceptions.exception.NotFoundException;
 import org.example.repository.DetailAccountRepository;
 import org.example.service.serviceImpl.DetailAccountServiceImpl;
+import org.example.utils.ModelUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,15 +42,12 @@ public class DetailAccountServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        this.detailAccount = new DetailAccount();
-        this.detailAccount.setId(1L);
-
-        this.detailAccountDTO = new DetailAccountDTO();
-        this.detailAccountDTO.setId(1L);
+        this.detailAccount = ModelUtils.getDetailAccountSimplified();
+        this.detailAccountDTO = ModelUtils.getDetailAccountDTOSimplified();
     }
 
     @Test
-    void testGetAllDetailAccounts() {
+    void testGetAllDetailAccounts_returnsDetailAccountsList() {
         when(this.detailAccountRepo.findAll()).thenReturn(List.of(this.detailAccount));
         when(this.modelMapper.map(any(DetailAccount.class), eq(DetailAccountDTO.class)))
                 .thenReturn(this.detailAccountDTO);
@@ -61,7 +60,7 @@ public class DetailAccountServiceImplTest {
     }
 
     @Test
-    void testGetDetailAccountById() {
+    void testGetDetailAccountById_returnsDetailAccount() {
         when(this.detailAccountRepo.findById(anyLong())).thenReturn(Optional.of(this.detailAccount));
         when(this.modelMapper.map(any(DetailAccount.class), eq(DetailAccountDTO.class)))
                 .thenReturn(this.detailAccountDTO);
@@ -74,7 +73,7 @@ public class DetailAccountServiceImplTest {
     }
 
     @Test
-    void testCreateDetailAccount() {
+    void testCreateDetailAccount_successfullyCreatesDetailAccount() {
         when(this.modelMapper.map(any(DetailAccountDTO.class), eq(DetailAccount.class)))
                 .thenReturn(this.detailAccount);
         when(this.detailAccountRepo.save(any(DetailAccount.class))).thenReturn(this.detailAccount);
@@ -89,7 +88,7 @@ public class DetailAccountServiceImplTest {
     }
 
     @Test
-    void testUpdateDetailAccount() {
+    void testUpdateDetailAccount_successfullyUpdatesDetailAccount() {
         when(this.detailAccountRepo.findById(anyLong())).thenReturn(Optional.of(this.detailAccount));
         doAnswer(invocation -> {
             DetailAccountDTO source = invocation.getArgument(0);
@@ -109,7 +108,7 @@ public class DetailAccountServiceImplTest {
     }
 
     @Test
-    void testDeleteDetailAccount() {
+    void testDeleteDetailAccount_successfullyDeletesDetailAccount() {
         when(this.detailAccountRepo.existsById(anyLong())).thenReturn(true);
 
         this.detailAccountService.deleteDetailAccount(1L);
@@ -156,11 +155,10 @@ public class DetailAccountServiceImplTest {
         verify(this.detailAccountRepo, never()).save(any(DetailAccount.class));
     }
 
-    // src/test/java/org/example/service/DetailAccountServiceImplTest.java
     @Test
     void testDeleteDetailAccount_Exception() {
         when(this.detailAccountRepo.existsById(anyLong())).thenReturn(true);
-        doThrow(new RuntimeException("Database error")).when(this.detailAccountRepo).deleteById(anyLong());
+        doThrow(new RuntimeException(TestMessages.DATABASE_ERROR)).when(this.detailAccountRepo).deleteById(anyLong());
 
         assertThrows(RuntimeException.class, () -> this.detailAccountService.deleteDetailAccount(1L));
         verify(this.detailAccountRepo, times(1)).existsById(anyLong());

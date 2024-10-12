@@ -11,6 +11,7 @@ import org.example.exceptions.exception.NotFoundException;
 import org.example.repository.BankAccountRepository;
 import org.example.repository.UserRepository;
 import org.example.service.serviceImpl.BankAccountServiceImpl;
+import org.example.utils.ModelUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,20 +52,13 @@ public class BankAccountServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        this.bankAccount = new BankAccount();
-        this.bankAccount.setId(1L);
-        this.bankAccount.setBalance(BigDecimal.ZERO);
-
-        this.bankAccountDTO = new BankAccountDTO();
-        this.bankAccountDTO.setId(1L);
-        this.bankAccountDTO.setUserId(1L);
-
-        this.user = new User();
-        this.user.setId(1L);
+        this.bankAccount = ModelUtils.getBankAccount();
+        this.bankAccountDTO = ModelUtils.getBankAccountDTOSimplified();
+        this.user = ModelUtils.getUserSimplified();
     }
 
     @Test
-    void testGetAllBankAccounts() {
+    void testGetAllBankAccounts_returnsBankAccountsList() {
         when(this.bankAccountRepo.findAll()).thenReturn(List.of(this.bankAccount));
         when(this.modelMapper.map(any(BankAccount.class), eq(BankAccountDTO.class)))
                 .thenReturn(this.bankAccountDTO);
@@ -77,7 +71,7 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testGetBankAccountById() {
+    void testGetBankAccountById_returnsBankAccount() {
         when(this.bankAccountRepo.findById(anyLong())).thenReturn(Optional.of(this.bankAccount));
         when(this.modelMapper.map(any(BankAccount.class), eq(BankAccountDTO.class)))
                 .thenReturn(this.bankAccountDTO);
@@ -90,7 +84,7 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testCreateBankAccount() {
+    void testCreateBankAccount_successfullyCreatesBankAccount() {
         when(this.userRepo.findById(anyLong())).thenReturn(Optional.of(this.user));
         when(this.modelMapper.map(eq(this.bankAccountDTO), eq(BankAccount.class))).thenReturn(this.bankAccount);
         when(this.bankAccountRepo.save(any(BankAccount.class))).thenReturn(this.bankAccount);
@@ -104,7 +98,7 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testDeleteBankAccount() {
+    void testDeleteBankAccount_successfullyDeletesBankAccount() {
         when(this.bankAccountRepo.existsById(anyLong())).thenReturn(true);
 
         this.bankAccountService.deleteBankAccount(1L);
@@ -113,13 +107,11 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testDepositFunds() {
+    void testDepositFunds_successfullyDepositsFunds() {
         when(this.bankAccountRepo.findById(anyLong())).thenReturn(Optional.of(this.bankAccount));
         when(this.bankAccountRepo.save(any(BankAccount.class))).thenReturn(this.bankAccount);
 
-        DepositDTO depositDTO = new DepositDTO();
-        depositDTO.setAccountId(1L);
-        depositDTO.setAmount(BigDecimal.TEN);
+        DepositDTO depositDTO = ModelUtils.getDepositDTO();
 
         this.bankAccountService.depositFunds(depositDTO);
 
@@ -128,14 +120,12 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testWithdrawFunds() {
+    void testWithdrawFunds_successfullyWithdrawsFunds() {
         this.bankAccount.setBalance(BigDecimal.TEN);
         when(this.bankAccountRepo.findById(anyLong())).thenReturn(Optional.of(this.bankAccount));
         when(this.bankAccountRepo.save(any(BankAccount.class))).thenReturn(this.bankAccount);
 
-        WithdrawalDTO withdrawalDTO = new WithdrawalDTO();
-        withdrawalDTO.setAccountId(1L);
-        withdrawalDTO.setAmount(BigDecimal.ONE);
+        WithdrawalDTO withdrawalDTO = ModelUtils.getWithdrawalDTOAnalog();
 
         this.bankAccountService.withdrawFunds(withdrawalDTO);
 
@@ -144,10 +134,8 @@ public class BankAccountServiceImplTest {
     }
 
     @Test
-    void testTransferFunds() {
-        BankAccount destinationAccount = new BankAccount();
-        destinationAccount.setId(2L);
-        destinationAccount.setBalance(BigDecimal.ZERO);
+    void testTransferFunds_successfullyTransfersFunds() {
+        BankAccount destinationAccount = ModelUtils.getBankAccount2();
 
         this.bankAccount.setBalance(BigDecimal.TEN);
 
