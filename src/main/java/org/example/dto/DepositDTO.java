@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.constant.ServiceValidationConstants;
 
 import java.math.BigDecimal;
 
@@ -14,11 +15,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DepositDTO {
-    @NotNull(message = "Account ID cannot be null")
-    @Positive(message = "Account ID must be a positive number")
+    @NotNull(message = ServiceValidationConstants.ACCOUNT_ID_NOT_NULL)
+    @Positive(message = ServiceValidationConstants.ACCOUNT_ID_POSITIVE)
     private Long accountId;
 
-    @NotNull(message = "Amount cannot be null")
-    @Positive(message = "Amount must be a positive number")
+    @NotNull(message = ServiceValidationConstants.AMOUNT_NOT_NULL)
+    @Positive(message = ServiceValidationConstants.AMOUNT_POSITIVE)
     private BigDecimal amount;
 }

@@ -15,4 +15,14 @@ public final class ServiceValidationConstants {
     public static final String DATE_START_NOT_NULL = "{bankApi.validation.bankAccount.dateStart.notNull}";
     public static final String VALID_UNTIL_NOT_NULL = "{bankApi.validation.bankAccount.validUntil.notNull}";
     public static final String BALANCE_NOT_NULL = "{bankApi.validation.bankAccount.balance.notNull}";
+    public static final String ACCOUNT_ID_NOT_NULL = "{bankApi.validation.bankAccount.accountId.notNull}";
+    public static final String ACCOUNT_ID_POSITIVE = "{bankApi.validation.bankAccount.accountId.positive}";
+    public static final String AMOUNT_NOT_NULL = "{bankApi.validation.deposit.amount.notNull}";
+    public static final String AMOUNT_POSITIVE = "{bankApi.validation.deposit.amount.positive}";
+    public static final String SOURCE_ACCOUNT_ID_NOT_NULL = "{bankApi.validation.transfer.sourceAccountId.notNull}";
+    public static final String SOURCE_ACCOUNT_ID_POSITIVE = "{bankApi.validation.transfer.sourceAccountId.positive}";
+    public static final String DESTINATION_ACCOUNT_ID_NOT_NULL = "{bankApi.validation.transfer.destinationAccountId.notNull}";
+    public static final String DESTINATION_ACCOUNT_ID_POSITIVE = "{bankApi.validation.transfer.destinationAccountId.positive}";
+    public static final String ACCOUNT_NOT_NULL = "{bankApi.validation.transfer.amount.notNull}";
+    public static final String ACCOUNT_POSITIVE = "{bankApi.validation.transfer.amount.positive}";
 }
