@@ -18,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@Builder
 public class BankAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

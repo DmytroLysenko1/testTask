@@ -11,117 +11,117 @@ import java.time.LocalDate;
 
 public class ModelUtils {
     public static BankAccountDTO getBankAccountDTO() {
-        BankAccountDTO bankAccountDTO = new BankAccountDTO();
-        bankAccountDTO.setId(1L);
-        bankAccountDTO.setBankNumber("123456");
-        bankAccountDTO.setType("SAVINGS");
-        bankAccountDTO.setStatus("ACTIVE");
-        bankAccountDTO.setUserId(1L);
-        return bankAccountDTO;
+        return BankAccountDTO.builder()
+                .id(1L)
+                .bankNumber("123456")
+                .type("SAVINGS")
+                .status("ACTIVE")
+                .userId(1L)
+                .build();
     }
 
     public static BankAccountDTO getBankAccountDTOSimplified() {
-        BankAccountDTO bankAccountDTO = new BankAccountDTO();
-        bankAccountDTO.setId(1L);
-        bankAccountDTO.setUserId(1L);
-        return bankAccountDTO;
+        return BankAccountDTO.builder()
+                .id(1L)
+                .userId(1L)
+                .build();
     }
 
     public static BankAccount getBankAccount() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setId(1L);
-        bankAccount.setBalance(BigDecimal.ZERO);
-        return bankAccount;
+        return BankAccount.builder()
+                .id(1L)
+                .balance(BigDecimal.ZERO)
+                .build();
     }
 
     public static BankAccount getBankAccount2() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setId(2L);
-        bankAccount.setBalance(BigDecimal.ZERO);
-        return bankAccount;
+        return BankAccount.builder()
+                .id(2L)
+                .balance(BigDecimal.ZERO)
+                .build();
     }
 
     public static User getUser() {
-        User user = new User();
-        user.setId(1L);
-        user.setUsername("John Doe");
-        user.setEmail("john.doe@example.com");
-        user.setRole(Role.USER);
-        user.setPassword("password");
-        return user;
+        return User.builder()
+                .id(1L)
+                .username("John Doe")
+                .email("john.doe@example.com")
+                .role(Role.USER)
+                .password("password")
+                .build();
     }
 
     public static User getUserSimplified() {
-        User user = new User();
-        user.setId(1L);
-        return user;
+        return User.builder()
+                .id(1L)
+                .build();
     }
 
     public static UserDTO getUserDTO() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername("John Doe");
-        userDTO.setEmail("john.doe@example.com");
-        userDTO.setPassword("password");
-        return userDTO;
+        return UserDTO.builder()
+                .username("John Doe")
+                .email("john.doe@example.com")
+                .password("password")
+                .build();
     }
 
     public static UserDTO getUserDTO2() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUsername("Jane Doe");
-        userDTO.setEmail("jane.doe@example.com");
-        userDTO.setPassword("password");
-        return userDTO;
+        return UserDTO.builder()
+                .username("Jane Doe")
+                .email("jane.doe@example.com")
+                .password("password")
+                .build();
     }
 
     public static DetailAccountDTO getDetailAccountDTO() {
-        DetailAccountDTO detailAccountDTO = new DetailAccountDTO();
-        detailAccountDTO.setId(1L);
-        detailAccountDTO.setReportingDate(LocalDate.now());
-        detailAccountDTO.setSum(new BigDecimal("1000"));
-        detailAccountDTO.setPercentage(new BigDecimal("5"));
-        detailAccountDTO.setDiscountRate(new BigDecimal("2"));
-        detailAccountDTO.setTotalSum(1000L);
-        detailAccountDTO.setBankAccountId(1L);
-        return detailAccountDTO;
+        return DetailAccountDTO.builder()
+                .id(1L)
+                .reportingDate(LocalDate.now())
+                .sum(new BigDecimal("1000"))
+                .percentage(new BigDecimal("5"))
+                .discountRate(new BigDecimal("2"))
+                .totalSum(1000L)
+                .bankAccountId(1L)
+                .build();
     }
 
     public static DetailAccountDTO getDetailAccountDTOSimplified() {
-        DetailAccountDTO detailAccount = new DetailAccountDTO();
-        detailAccount.setId(1L);
-        return detailAccount;
+        return DetailAccountDTO.builder()
+                .id(1L)
+                .build();
     }
     public static DetailAccount getDetailAccountSimplified() {
-        DetailAccount detailAccount = new DetailAccount();
-        detailAccount.setId(1L);
-        return detailAccount;
+        return DetailAccount.builder()
+                .id(1L)
+                .build();
     }
 
     public static TransferDTO getTransferDTO() {
-        TransferDTO transferDTO = new TransferDTO();
-        transferDTO.setSourceAccountId(1L);
-        transferDTO.setDestinationAccountId(2L);
-        transferDTO.setAmount(new BigDecimal("100"));
-        return transferDTO;
+        return TransferDTO.builder()
+                .sourceAccountId(1L)
+                .destinationAccountId(2L)
+                .amount(new BigDecimal("100"))
+                .build();
     }
 
     public static WithdrawalDTO getWithdrawalDTO() {
-        WithdrawalDTO withdrawalDTO = new WithdrawalDTO();
-        withdrawalDTO.setAccountId(1L);
-        withdrawalDTO.setAmount(new BigDecimal("100"));
-        return withdrawalDTO;
+        return WithdrawalDTO.builder()
+                .accountId(1L)
+                .amount(new BigDecimal("100"))
+                .build();
     }
 
     public static WithdrawalDTO getWithdrawalDTOAnalog() {
-        WithdrawalDTO withdrawalDTO = new WithdrawalDTO();
-        withdrawalDTO.setAccountId(1L);
-        withdrawalDTO.setAmount(BigDecimal.ONE);
-        return withdrawalDTO;
+        return WithdrawalDTO.builder()
+                .accountId(1L)
+                .amount(BigDecimal.TEN)
+                .build();
     }
 
     public static DepositDTO getDepositDTO() {
-        DepositDTO depositDTO = new DepositDTO();
-        depositDTO.setAccountId(1L);
-        depositDTO.setAmount(BigDecimal.TEN);
-        return depositDTO;
+        return DepositDTO.builder()
+                .accountId(1L)
+                .amount(BigDecimal.TEN)
+                .build();
     }
 }

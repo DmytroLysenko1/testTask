@@ -8,7 +8,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@Builder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class BankAccountDTO {
     private Long id;
     @NotBlank

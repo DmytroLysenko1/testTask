@@ -9,6 +9,8 @@ import org.example.constant.ServiceValidationConstants;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+
 public class UserDTO {
     @Size(min = 1, max = 70, message = ServiceValidationConstants.USER_NAME_LENGTH)
     private String username;
