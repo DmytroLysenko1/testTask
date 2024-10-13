@@ -1,6 +1,5 @@
 package org.example.service.serviceImpl;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.constant.ErrorMessage;
@@ -33,7 +32,7 @@ public class DetailAccountServiceImpl implements DetailAccountService {
     }
 
     @Override
-    public DetailAccountDTO getDetailAccountById(@NotNull Long id) {
+    public DetailAccountDTO getDetailAccountById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException(ErrorMessage.DETAILACCOUNT_ID_CANNOT_BE_NULL);
         }
@@ -61,7 +60,7 @@ public class DetailAccountServiceImpl implements DetailAccountService {
     }
 
     @Override
-    public DetailAccountDTO updateDetailAccount(@NotNull Long id, DetailAccountDTO detailAccountDTO) {
+    public DetailAccountDTO updateDetailAccount(Long id, DetailAccountDTO detailAccountDTO) {
         if (detailAccountDTO == null) {
             throw new IllegalArgumentException(ErrorMessage.DETAILACCOUNTDTO_CANNOT_BE_NULL);
         }
@@ -78,7 +77,7 @@ public class DetailAccountServiceImpl implements DetailAccountService {
     }
 
     @Override
-    public void deleteDetailAccount(@NotNull Long id) {
+    public void deleteDetailAccount(Long id) {
         log.info(LogMessage.DELETING_DETAIL_ACCOUNT, id);
 
         if (!this.detailAccountRepo.existsById(id)) {
@@ -88,7 +87,7 @@ public class DetailAccountServiceImpl implements DetailAccountService {
         this.detailAccountRepo.deleteById(id);
     }
 
-    private DetailAccount findDetailAccountById(@NotNull Long id) {
+    private DetailAccount findDetailAccountById(Long id) {
         return this.detailAccountRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.DETAILACCOUNT_IS_NOT_FOUND_BY_ID + id));
     }

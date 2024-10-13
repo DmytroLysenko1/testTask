@@ -1,7 +1,6 @@
 package org.example.service.serviceImpl;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.constant.ErrorMessage;
@@ -40,7 +39,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public BankAccountDTO getBankAccountById(@NotNull Long id) {
+    public BankAccountDTO getBankAccountById(Long id) {
         log.info(LogMessage.FETCHING_BANK_ACCOUNT_BY_ID, id);
 
         BankAccount bankAccount = findBankAccountById(id);
@@ -70,7 +69,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     @Transactional
-    public BankAccountDTO updateBankAccount(@NotNull Long id, BankAccountDTO bankAccountDTO) {
+    public BankAccountDTO updateBankAccount(Long id, BankAccountDTO bankAccountDTO) {
         BankAccount existingBankAccount = findBankAccountById(id);
 
         this.modelMapper.map(bankAccountDTO, existingBankAccount);
@@ -84,7 +83,7 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     @Transactional
-    public void deleteBankAccount(@NotNull Long id) {
+    public void deleteBankAccount(Long id) {
         log.info(LogMessage.DELETING_BANK_ACCOUNT, id);
 
         if (!this.bankAccountRepo.existsById(id)) {
@@ -143,13 +142,13 @@ public class BankAccountServiceImpl implements BankAccountService {
                 transferDTO.getSourceAccountId(), transferDTO.getDestinationAccountId());
     }
 
-    private BankAccount findBankAccountById(@NotNull Long id) {
+    private BankAccount findBankAccountById(Long id) {
         log.debug(LogMessage.FINDING_BANK_ACCOUNT_BY_ID);
         return this.bankAccountRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.BANKACCOUNT_NOT_FOUND_BY_ID + id));
     }
 
-    private User findUserById(@NotNull Long userId) {
+    private User findUserById(Long userId) {
         log.debug(LogMessage.FINDING_USER_BY_ID);
         return this.userRepo.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
