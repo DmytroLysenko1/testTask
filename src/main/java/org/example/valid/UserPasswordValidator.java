@@ -6,11 +6,8 @@ import org.example.annotations.PasswordValidation;
 import org.passay.*;
 
 public class UserPasswordValidator implements ConstraintValidator<PasswordValidation, String> {
-    private final PasswordValidator validator;
+    private PasswordValidator validator;
 
-    /**
-     * Default constructor that init PasswordValidator.
-     */
     public UserPasswordValidator() {
         this.validator = new PasswordValidator(
                 new LengthRule(8, 20),
@@ -19,11 +16,6 @@ public class UserPasswordValidator implements ConstraintValidator<PasswordValida
                 new CharacterRule(EnglishCharacterData.Digit, 1),
                 new CharacterRule(EnglishCharacterData.Special, 1),
                 new WhitespaceRule());
-    }
-
-    @Override
-    public void initialize(PasswordValidation constraintAnnotation) {
-        // Initializes the validator in preparation for #isValid calls
     }
 
     @Override
