@@ -45,6 +45,11 @@ Lombok reduces boilerplate code for model classes by automatically generating ge
 JUnit 5 is used for writing unit tests to ensure the correctness of the application. Mockito is employed for mocking dependencies, allowing for isolated testing of the service logic. The combination ensures that the application is thoroughly tested and behaves as expected under various conditions.
 
 ## Setup Instructions
+
+### Before Starting 
+- Ensure that Java 17 or higher is installed on your system.
+- Go to the src/main/resources/sql/Sql.sql file and run the SQL script to create the database and tables. 
+
 ### Required PostgreSQL Configurations
 ```bash
 spring.datasource.url=jdbc:postgresql://localhost:5432/bank_app

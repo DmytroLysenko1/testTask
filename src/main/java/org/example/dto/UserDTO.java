@@ -3,6 +3,7 @@ package org.example.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.example.annotations.PasswordValidation;
 import org.example.constant.ServiceValidationConstants;
 
 
@@ -16,6 +17,7 @@ public class UserDTO {
     private String username;
     @Email
     private String email;
+    @PasswordValidation
     @Size(min = 6, max = 70, message = ServiceValidationConstants.PASSWORD_LENGTH)
     private String password;
 }

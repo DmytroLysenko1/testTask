@@ -35,6 +35,7 @@
         <mockito.version>5.14.1</mockito.version>
         <json.web.token.version>0.12.6</json.web.token.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <passay.version>1.6.5</passay.version>
     </properties>
     <dependencies>
         <dependency>
@@ -105,6 +106,12 @@
             <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>${passay.version}</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>
