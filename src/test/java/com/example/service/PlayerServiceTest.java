@@ -93,7 +93,7 @@ public class PlayerServiceTest {
         when(modelMapper.map(playerRequestDTO, Player.class)).thenReturn(player);
         when(playerRepository.save(player)).thenReturn(player);
         when(modelMapper.map(player, PlayerResponseDTO.class)).thenReturn(playerResponseDTO);
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(team)); // Mock teamRepository to return a valid Team
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team)); 
 
         PlayerResponseDTO result = playerService.saveRookiePlayer(playerRequestDTO);
 
@@ -108,13 +108,13 @@ public class PlayerServiceTest {
     void updatePlayer_ShouldReturnUpdatedPlayerResponseDTO() {
         Long playerId = 1L;
         PlayerRequestDTO playerRequestDTO = new PlayerRequestDTO();
-        playerRequestDTO.setTeamId(1L); // Ensure teamId is set
+        playerRequestDTO.setTeamId(1L); 
         Player existingPlayer = new Player();
         PlayerResponseDTO playerResponseDTO = new PlayerResponseDTO();
         Team team = new Team();
 
         when(playerRepository.findById(playerId)).thenReturn(Optional.of(existingPlayer));
-        when(teamRepository.findById(1L)).thenReturn(Optional.of(team)); // Mock teamRepository to return a valid Team
+        when(teamRepository.findById(1L)).thenReturn(Optional.of(team)); 
         doAnswer(invocation -> {
             PlayerRequestDTO source = invocation.getArgument(0);
             Player destination = invocation.getArgument(1);
@@ -138,18 +138,12 @@ public class PlayerServiceTest {
     void deletePlayer_ShouldDeletePlayer() {
         Long playerId = 1L;
         Player existingPlayer = new Player();
-        existingPlayer.setId(playerId); // Make sure playerId is set.
+        existingPlayer.setId(playerId);
 
-        // Mock the behavior of the playerRepository to return the player when findById is called.
         when(playerRepository.findByIdWithLock(playerId)).thenReturn(Optional.of(existingPlayer));
-
-        // Call the service method
         playerService.deletePlayer(playerId);
 
-        // Verify that the findById method was called with the correct playerId.
         verify(playerRepository).findByIdWithLock(playerId);
-
-        // Verify that deleteById was called with the correct playerId.
         verify(playerRepository).deleteById(playerId);
     }
 }
